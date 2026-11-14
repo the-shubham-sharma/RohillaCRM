@@ -1,0 +1,102 @@
+# ==============================================================================
+# ROHILLA ADVERTISING CRM — DOCKER COMPOSE ORCHESTRATION
+# Architecture: PostgreSQL 16 <-> Spring Boot 3 API <-> Nginx & React SPA
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. PostgreSQL Production Database
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: rohilla-crm-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-rohilla_crm}
+      POSTGRES_USER: ${POSTGRES_USER:-rohilla_db_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ChangeThisInEnvFile!}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-rohilla_db_user} -d ${POSTGRES_DB:-rohilla_crm}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - rohilla-network
+
+  # ----------------------------------------------------------------------------
+  # 2. Spring Boot Backend API (Stateless, Argon2id, JWT Rotation, Audit Engine)
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rohilla-crm-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-rohilla_crm}
+      DATABASE_USERNAME: ${POSTGRES_USER:-rohilla_db_user}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-ChangeThisInEnvFile!}
+      JWT_SECRET: ${JWT_SECRET:-d32b55f1e7b99c72e29384bbad54890c00112233445566778899aabbccddeeff}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-8f8a7e6d5c4b3a2110099887766554433221100aabbccddeeff00112233445566}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-https://crm.yourdomain.com}
+      STORAGE_BASE_PATH: /var/rohilla/storage
+      INITIAL_OWNER_EMAIL: ${INITIAL_OWNER_EMAIL:-owner@rohilla.com}
+      INITIAL_OWNER_PASSWORD: ${INITIAL_OWNER_PASSWORD:-}
+      INITIAL_OWNER_NAME: ${INITIAL_OWNER_NAME:-Aditye Rohilla}
+      INITIAL_OWNER_PHONE: ${INITIAL_OWNER_PHONE:-+91-9811000000}
+    volumes:
+      - storage_data:/var/rohilla/storage
+      - logs_data:/app/logs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    networks:
+      - rohilla-network
+
+  # ----------------------------------------------------------------------------
+  # 3. Nginx Reverse Proxy & React Production SPA
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: rohilla-crm-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "80:80"
+    networks:
+      - rohilla-network
+
+# ------------------------------------------------------------------------------
+# Persistent Storage Volumes
+# ------------------------------------------------------------------------------
+volumes:
+  postgres_data:
+    name: rohilla_crm_postgres_data
+  storage_data:
+    name: rohilla_crm_storage_data
+  logs_data:
+    name: rohilla_crm_logs_data
+
+# ------------------------------------------------------------------------------
+# Isolated Internal Network
+# ------------------------------------------------------------------------------
+networks:
+  rohilla-network:
+    name: rohilla_crm_network
+    driver: bridge

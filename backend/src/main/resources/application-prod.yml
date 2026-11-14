@@ -1,0 +1,64 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://postgres:5432/rohilla_crm}
+    username: ${DATABASE_USERNAME:rohilla_user}
+    password: ${DATABASE_PASSWORD:}
+    driverClassName: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      connection-timeout: 30000
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
+
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    refresh-token-secret: ${REFRESH_TOKEN_SECRET}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:https://crm.yourdomain.com}
+  storage:
+    upload-dir: ${STORAGE_BASE_PATH:/var/rohilla/storage}
+  initial-owner:
+    email: ${INITIAL_OWNER_EMAIL:owner@rohilla.com}
+    password: ${INITIAL_OWNER_PASSWORD:}
+    name: ${INITIAL_OWNER_NAME:Aditye Rohilla}
+    phone: ${INITIAL_OWNER_PHONE:+91-9811000000}
+
+server:
+  port: ${PORT:8080}
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  level:
+    root: INFO
+    com.rohilla.crm: INFO
+    org.springframework.security: WARN
+    org.hibernate: WARN

@@ -1,0 +1,39 @@
+# ==============================================================================
+# ROHILLA ADVERTISING CRM — DOCKER COMPOSE PRODUCTION OVERRIDES
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  postgres:
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 2048M
+        reservations:
+          memory: 512M
+
+  backend:
+    restart: always
+    environment:
+      JAVA_OPTS: "-XX:+UseG1GC -XX:MaxRAMPercentage=75.0 -XX:+ExitOnOutOfMemoryError"
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2048M
+        reservations:
+          memory: 512M
+
+  frontend:
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M

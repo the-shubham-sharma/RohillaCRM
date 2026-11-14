@@ -1,0 +1,32 @@
+# Environment files & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+
+# Backend Build & Output
+backend/target/
+backend/.mvn/
+backend/*.log
+backend/logs/
+backend/uploads/
+
+# Frontend Build & Dependencies
+frontend/node_modules/
+frontend/dist/
+frontend/.cache/
+frontend/*.log
+
+# IDE & OS files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Storage / Backups
+backups/
+uploads/
+storage/
