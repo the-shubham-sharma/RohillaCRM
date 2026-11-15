@@ -126,7 +126,12 @@ In your Render Web Service settings, go to the **Environment** tab and add the f
 | Environment Variable | Value | Purpose |
 |----------------------|-------|---------|
 | `SPRING_PROFILES_ACTIVE` | `prod` | Enables PostgreSQL, non-destructive schema update (`ddl-auto: update`), and production bootstrap |
-| `DATABASE_URL` | *Paste your Render Internal Database URL* | Connects backend to database using Render's fast private network |
+| `DB_HOST` | `dpg-xxxxxx-a` (or `dpg-xxxxxx-a.oregon-postgres.render.com`) | Render PostgreSQL Host (use Internal Host for fast private networking) |
+| `DB_PORT` | `5432` | PostgreSQL port |
+| `DB_NAME` | `rohilla_crm` (or your database name) | PostgreSQL database name |
+| `DB_USERNAME` | `rohilla_user` | PostgreSQL database user |
+| `DB_PASSWORD` | *Your Render PostgreSQL Password* | Secret database password |
+| `DB_SSL_MODE` | `?sslmode=require` | Enforces SSL encryption |
 | `JWT_SECRET` | *64-byte random hex string* | Signs and validates access tokens (`openssl rand -hex 64`) |
 | `REFRESH_TOKEN_SECRET` | *64-byte random hex string* | Signs and validates refresh tokens (`openssl rand -hex 64`) |
 | `CORS_ALLOWED_ORIGINS` | `https://crm.yourdomain.com` | Restricts API access strictly to your Hostinger frontend domain |
@@ -136,9 +141,11 @@ In your Render Web Service settings, go to the **Environment** tab and add the f
 | `INITIAL_OWNER_NAME` | `Aditye Rohilla` | Display name of the owner |
 | `INITIAL_OWNER_PHONE` | `+91-9811000000` | Contact phone number |
 
-> [!NOTE]
-> The backend automatically detects `postgres://` or `postgresql://` in `DATABASE_URL` and formats it for JDBC with SSL automatically.
-> You do **not** need to manually alter Render's internal URL.
+> [!TIP]
+> **Preferred Approach: Separate DB Environment Variables (`DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, `DB_PASSWORD`)**  
+> The backend automatically formats these into a standard PostgreSQL JDBC URL:  
+> `jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=require`  
+> This eliminates JDBC driver URL mismatch errors on Render. If you link Render PostgreSQL directly (which sets `DATABASE_URL=postgresql://...`), the built-in URL processor also normalizes it automatically.
 
 ### 5. Health Check Path
 In Render Web Service settings under **Advanced**:
