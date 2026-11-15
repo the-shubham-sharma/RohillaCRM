@@ -14,7 +14,7 @@ WORKDIR /build
 COPY pom.xml .
 
 # Download dependencies in a separate layer to leverage Docker build cache
-RUN mvn dependency:go-offline -B
+RUN mvn dependency:go-offline -B || true
 
 # Copy application source code
 COPY src ./src
@@ -55,7 +55,7 @@ ENV SPRING_PROFILES_ACTIVE=prod \
 
 # Container healthcheck using Spring Boot Actuator
 HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
+  CMD curl -f http://localhost:${PORT:-8080}/actuator/health || exit 1
 
 # Launch application
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]

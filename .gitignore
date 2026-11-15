@@ -1,10 +1,20 @@
 # Environment files & Secrets
 .env
 .env.*
+.env.local
+.env.production
 !.env.example
 *.pem
 *.key
 *.crt
+*.p12
+
+# Database Dumps & Backups
+*.sql
+*.dump
+*.tar.gz
+*.bak
+backups/
 
 # Backend Build & Output
 backend/target/
@@ -12,12 +22,21 @@ backend/.mvn/
 backend/*.log
 backend/logs/
 backend/uploads/
+target/
 
 # Frontend Build & Dependencies
 frontend/node_modules/
 frontend/dist/
 frontend/.cache/
 frontend/*.log
+node_modules/
+dist/
+
+# Generic Logs & Storage
+*.log
+logs/
+uploads/
+storage/
 
 # IDE & OS files
 .idea/
@@ -25,8 +44,9 @@ frontend/*.log
 *.iml
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Storage / Backups
-backups/
-uploads/
-storage/
+# Environment secrets
+.env
+.env.*
+!.env.example

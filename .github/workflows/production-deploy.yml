@@ -89,12 +89,12 @@ jobs:
           tags: rohilla-crm-frontend:latest
 
   # ----------------------------------------------------------------------------
-  # Job 4: Deploy to Hostinger VPS (Triggered only on main/production push)
+  # Job 4: Optional Legacy VPS Deploy (Triggered only if VPS secret is configured)
   # ----------------------------------------------------------------------------
-  deploy-hostinger:
-    name: Deploy to Hostinger VPS
+  deploy-hostinger-vps:
+    name: Optional Deploy to Hostinger VPS
     needs: [docker-check]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/production'
+    if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/production') && secrets.HOSTINGER_VPS_IP != ''
     runs-on: ubuntu-latest
 
     steps:

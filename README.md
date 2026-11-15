@@ -208,3 +208,11 @@ powershell -ExecutionPolicy Bypass -File "scripts/test-gateway-flow.ps1"
 # 4. Live End-to-End Workflow & QC Rework Lifecycle Tests
 powershell -ExecutionPolicy Bypass -File "scripts/test-workflow-lifecycle.ps1"
 ```
+
+---
+
+## 7. Production Deployment (GitHub, Render & Hostinger)
+
+For complete instructions on deploying the backend to Render (Docker & PostgreSQL) and frontend to Hostinger static hosting:
+- Consult the detailed [Render and Hostinger Deployment Guide](docs/deployment/render-and-hostinger.md).
+- Configuration templates: [.env.example](.env.example) and [frontend/.env.example](frontend/.env.example).
